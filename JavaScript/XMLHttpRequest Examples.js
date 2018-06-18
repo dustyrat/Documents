@@ -47,96 +47,77 @@ xhr.send(body);
 
 /**********************************************************************************************************************************************************/
 
-var time, times = [],
-	runs = 0,
-	iter = 0,
-	xhr = new XMLHttpRequest(),
-	method = 'GET',
-	url = 'maintenance/getGroups';
+function calculateAverage(method, url, runs){
+	var xhr = new XMLHttpRequest(), time, times = [], iter = 0, errors = 0;
+	method = method ? method.toUpperCase() : 'GET';
+	url = url || '/';
+	runs = runs || 10;
 	
-xhr.addEventListener("loadstart", function(event){
-	console.log("Start", this, Utils.timeDiff(time, new Date()).toString());
-});
-
-xhr.addEventListener("abort", function(event){
-	var _time = Utils.timeDiff(time, new Date());
-	console.log("Abort", this, Utils.timeDiff(time, new Date()).toString(), average(), `Run: ${times.length}`);
-	console.log(this.responseURL, this.status, this.statusText, this.responseType);
-	if (!(iter < runs - 1)){ console.log(`Completed Average Time: ${average()}`); }
-});
-
-xhr.addEventListener("error", function(event){
-	var _time = Utils.timeDiff(time, new Date());
-	times.push(_time);
-	console.error("Error", this, Utils.timeDiff(time, new Date()).toString(), average(), `Run: ${times.length}`);
-	console.error(this.responseURL, this.status, this.statusText, this.responseType);
-	if (iter < runs - 1){ 
-		iter++;
-		send();
-	}
-	else { console.log(`Completed Average Time: ${average()}`); }
-});
-
-xhr.addEventListener("load", function(event){
-	var _time = Utils.timeDiff(time, new Date());
-	times.push(_time);
-	console.log("Done", this, _time.toString(), average(), `Run: ${times.length}`);
-	console.log(this.responseURL, this.status, this.statusText, this.responseType);
+	function send(){
+		xhr.open(method, url);
+		xhr.send();
+	};
 	
-	if (iter < runs - 1){ 
-		iter++;
-		send();
-	}
-	else { console.log(`Completed Average Time: ${average()}`); }
-});
+	function average(){
+		var milli = 0;
+		times.forEach(function(t){ milli += t.to_date.getTime() - t.from_date.getTime(); });
+		milli = milli / times.length;
 
-function start(_runs, reset){
-	if (reset){
-		cancel();
-		times = [];
-	}
-	iter = 0;
-	runs = _runs || 10;
+		var hours = Math.floor(milli / Utils.milliPerHour );
+		milli = milli - (hours * Utils.milliPerHour );
+
+		var minutes = Math.floor(milli / Utils.milliPerMinute );
+		milli = milli - (minutes * Utils.milliPerMinute );
+
+		var seconds = Math.floor(milli / 1000 );
+		milli = Math.floor(milli - (seconds * Utils.milliPerSecond ));
+
+		return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milli.toString().padStart(3, "0")}`;
+	};
+	
+	xhr.addEventListener("loadstart", function(event){
+		time = new Date();
+		console.log("Start", Utils.timeDiff(time, new Date()).toString());
+	});
+
+	xhr.addEventListener("abort", function(event){
+		console.log("Aborted", Utils.timeDiff(time, new Date()).toString(), `Run: ${times.length}`);
+		runs = NaN;
+	});
+
+	xhr.addEventListener("error", function(event){
+		errors++;
+		console.error("Error", Utils.timeDiff(time, new Date()).toString(), `Run: ${times.length}`);
+	});
+
+	xhr.addEventListener("loadend", function(event){
+		var timeDiff = Utils.timeDiff(time, new Date());
+		times.push(timeDiff);
+		console.log("Done", timeDiff.toString(), average(), `Run: ${times.length}`);
+		
+		if (iter < runs - 1){ 
+			iter++;
+			send();
+		}
+		else { console.log(`Completed Average Time: ${average()} with ${errors} error(s).`); }
+	});
+
 	send();
-};
+}
+calculateAverage('GET', '/jimi/maintenance/getGroups1');
 
-function cancel(){
-	runs = NaN;
-	xhr.abort();
-};
-
-function send(){
-    time = new Date();
-    xhr.open(method, url);
-    xhr.send();
-};
-
-function average(){
-	var milli = 0;
-	times.forEach(function(t){ milli += t.to_date.getTime() - t.from_date.getTime(); });
-	milli = milli / times.length;
-
-	var hours = Math.floor(milli / Utils.milliPerHour );
-    milli = milli - (hours * Utils.milliPerHour );
-
-    var minutes = Math.floor(milli / Utils.milliPerMinute );
-    milli = milli - (minutes * Utils.milliPerMinute );
-
-    var seconds = Math.floor(milli / 1000 );
-    milli = Math.floor(milli - (seconds * Utils.milliPerSecond ));
-
-	return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milli.toString().padStart(3, "0")}`;
-};
-
-
-
-
+/**********************************************************************************************************************************************************/
 
 var xhr = new XMLHttpRequest();
-xhr.addEventListener("loadstart", function(event){ console.log("start", this); });
-xhr.addEventListener("abort", function(event){ console.log("abort", this); });
-xhr.addEventListener("error", function(event){ console.error("error", this); });
-xhr.addEventListener("load", function(event){ console.log("load", this); });
-xhr.addEventListener("timeout", function(event){ console.log("timeout", this); });
+xhr.addEventListener("loadstart", function(event){ console.log("Start", this); });
+xhr.addEventListener("timeout", function(event){ console.log("Timeout", this); });
+xhr.addEventListener("abort", function(event){ console.log("Aborted", this); });
+xhr.addEventListener("error", function(event){ console.error("Error", this); });
+xhr.addEventListener("load", function(event){ console.log("Loaded", this); });
+xhr.addEventListener("loadend", function(event){ console.log("Done", this); });
 xhr.open('GET', '/jimi/maintenance/queue');
 xhr.send();
+
+
+
+
