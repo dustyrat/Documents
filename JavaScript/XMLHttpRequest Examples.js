@@ -47,22 +47,95 @@ xhr.send(body);
 
 /**********************************************************************************************************************************************************/
 
-function calculateAverage(method, url, runs){
-	var xhr = new XMLHttpRequest(), time, times = [], iter = 0, errors = 0;
-	method = method ? method.toUpperCase() : 'GET';
-	url = url || '/';
-	runs = runs || 10;
+function XHRStats(method, url){
+	this.method = method ? method.toUpperCase() : 'GET';
+	this.url = url || '/';
 	
-	function send(){
-		xhr.open(method, url);
-		xhr.send();
+	this.abort = function(){
+		this.xhr.abort();
 	};
 	
-	function average(){
-		var milli = 0;
-		times.forEach(function(t){ milli += t.to_date.getTime() - t.from_date.getTime(); });
-		milli = milli / times.length;
+	this.run = function(runs){
+		this.xhr = new XMLHttpRequest();
+		this.time = [];
+		runs = runs || 10;
+		var $this = this, iter = 0, errors = 0;
+	
+		this.xhr.addEventListener("loadstart", function(event){
+			this.time = new Date();
+			console.log("Start - Time: %s, Run: %s", total(), $this.time.length + 1 + errors);
+		});
 
+		this.xhr.addEventListener("abort", function(event){
+			console.log("Aborted - Time: %s, Run: %s", Utils.timeDiff(this.time, new Date()).toString(),  $this.time.length + errors);
+			runs = NaN;
+		});
+
+		this.xhr.addEventListener("error", function(event){
+			errors++;
+			console.error("Error - Time: %s, Run: %s", Utils.timeDiff(this.time, new Date()).toString(),  $this.time.length + errors);
+		});
+
+		this.xhr.addEventListener("load", function(event){
+			var timeDiff = Utils.timeDiff(this.time, new Date());
+			$this.time.push(timeDiff);
+			console.log("Loaded - Time: %s, Average: %s, Run: %s", timeDiff.toString(), mean(),  $this.time.length + errors);
+		});
+
+		this.xhr.addEventListener("loadend", function(event){
+			if (iter < runs - 1){ 
+				iter++;
+				send();
+			}
+			else { console.log("Completed - Time: %s, Runs: %s, Errors: %s, Average: %s, Max: %s, Min: %s, Range: %s", total(), $this.time.length + errors, errors, mean(), max(), min(), range()); }
+		});
+		
+		function send(){
+			$this.xhr.open($this.method, $this.url);
+			$this.xhr.send();
+		};
+		send();
+	};
+	
+	function total(){
+		var milli = 0;
+		this.time.forEach(function(t){ milli += t.to_date.getTime() - t.from_date.getTime(); });
+		return getTime(milli);
+	}
+	
+	function min(){
+		var milli = this.time.map(function(time){ return time.to_date.getTime() - time.from_date.getTime(); }).reduce(function(a, b) {
+			return Math.min(a, b);
+		});
+		return getTime(milli);
+	};
+	
+	function max(){
+		var milli = this.time.map(function(time){ return time.to_date.getTime() - time.from_date.getTime(); }).reduce(function(a, b) {
+			return Math.max(a, b);
+		});
+		return getTime(milli);
+	};
+	
+	function mean(){
+		var milli = 0;
+		this.time.forEach(function(t){ milli += t.to_date.getTime() - t.from_date.getTime(); });
+		milli = milli / this.time.length;
+		return getTime(milli);
+	};
+	
+	function range(){
+		var max = this.time.map(function(time){ return time.to_date.getTime() - time.from_date.getTime(); }).reduce(function(a, b) {
+			return Math.max(a, b);
+		});
+		var min = this.time.map(function(time){ return time.to_date.getTime() - time.from_date.getTime(); }).reduce(function(a, b) {
+			return Math.min(a, b);
+		});
+		var milli = max - min;
+		return getTime(milli);
+	}
+	
+	function getTime(milli){
 		var hours = Math.floor(milli / Utils.milliPerHour );
 		milli = milli - (hours * Utils.milliPerHour );
 
@@ -73,38 +146,12 @@ function calculateAverage(method, url, runs){
 		milli = Math.floor(milli - (seconds * Utils.milliPerSecond ));
 
 		return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${milli.toString().padStart(3, "0")}`;
-	};
-	
-	xhr.addEventListener("loadstart", function(event){
-		time = new Date();
-		console.log("Start", Utils.timeDiff(time, new Date()).toString());
-	});
+	}
+	return this;
+};
 
-	xhr.addEventListener("abort", function(event){
-		console.log("Aborted", Utils.timeDiff(time, new Date()).toString(), `Run: ${times.length}`);
-		runs = NaN;
-	});
-
-	xhr.addEventListener("error", function(event){
-		errors++;
-		console.error("Error", Utils.timeDiff(time, new Date()).toString(), `Run: ${times.length}`);
-	});
-
-	xhr.addEventListener("loadend", function(event){
-		var timeDiff = Utils.timeDiff(time, new Date());
-		times.push(timeDiff);
-		console.log("Done", timeDiff.toString(), average(), `Run: ${times.length}`);
-		
-		if (iter < runs - 1){ 
-			iter++;
-			send();
-		}
-		else { console.log(`Completed Average Time: ${average()} with ${errors} error(s).`); }
-	});
-
-	send();
-}
-calculateAverage('GET', '/jimi/maintenance/getGroups1');
+var stats = XHRStats('GET', '/jimi/maintenance/getGroups');
+stats.run(100);
 
 /**********************************************************************************************************************************************************/
 
@@ -115,7 +162,7 @@ xhr.addEventListener("abort", function(event){ console.log("Aborted", this); });
 xhr.addEventListener("error", function(event){ console.error("Error", this); });
 xhr.addEventListener("load", function(event){ console.log("Loaded", this); });
 xhr.addEventListener("loadend", function(event){ console.log("Done", this); });
-xhr.open('GET', '/jimi/maintenance/queue');
+xhr.open('POST', '/jimi/maintenance/queue');
 xhr.send();
 
 
