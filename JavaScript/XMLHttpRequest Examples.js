@@ -150,7 +150,7 @@ function XHRStats(method, url){
 	return this;
 };
 
-var stats = XHRStats('GET', '/jimi/maintenance/getGroups');
+var stats = XHRStats('GET', '/');
 stats.run(100);
 
 /**********************************************************************************************************************************************************/
@@ -162,7 +162,7 @@ xhr.addEventListener("abort", function(event){ console.log("Aborted", this); });
 xhr.addEventListener("error", function(event){ console.error("Error", this); });
 xhr.addEventListener("load", function(event){ console.log("Loaded", this); });
 xhr.addEventListener("loadend", function(event){ console.log("Done", this); });
-xhr.open('POST', '/jimi/maintenance/queue');
+xhr.open('POST', '/');
 xhr.send();
 
 

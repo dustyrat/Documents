@@ -63,7 +63,3 @@ mainServices.factory('$WebSocket', ['$q', '$rootScope', '$timeout',
         
         return $this;
 }]);
-
-    <listener>
-        <listener-class>com.harrislogic.stella.notification.MessageServerEndpoint</listener-class>
-    </listener>
