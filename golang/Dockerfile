@@ -4,7 +4,6 @@ FROM golang:alpine
 ENV GO111MODULE=on
 
 # Get build arguments
-ARG DIRECTORY
 ARG SHORT_COMMIT
 ARG NOW
 ARG HOSTNAME
