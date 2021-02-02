@@ -4,6 +4,7 @@ FROM golang:alpine
 ENV GO111MODULE=on
 
 # Get build arguments
+ARG DIRECTORY
 ARG SHORT_COMMIT
 ARG NOW
 ARG HOSTNAME
@@ -11,7 +12,7 @@ ARG GIT_URL
 ARG BRANCH_NAME
 
 # Install Tools and dependencies
-RUN apk add --update --no-cache openssl-dev musl-dev zlib-dev curl tzdata]
+RUN apk add --update --no-cache openssl-dev musl-dev zlib-dev curl tzdata
 
 # Move to working directory /build
 WORKDIR /build
@@ -40,7 +41,7 @@ WORKDIR /
 RUN cp /build/main .
 
 # Copy static files
-RUN cp -r /build/$NAME/swagge[r] ./swagger
+RUN cp -r /build/swagge[r] ./swagger
 
 # Clean up build folder
 RUN rm -rf /build
