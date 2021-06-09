@@ -1,6 +1,6 @@
 FROM golang:alpine
 
-# Set necessary environmet variables needed for our image
+# Set necessary environment variables needed for our image
 ENV GO111MODULE=on
 
 # Get build arguments
@@ -8,6 +8,7 @@ ARG SHORT_COMMIT
 ARG NOW
 ARG HOSTNAME
 ARG GIT_URL
+ARG ENVIRONMENT
 ARG BRANCH_NAME
 
 # Install Tools and dependencies
@@ -29,6 +30,7 @@ RUN go build -ldflags "\
     -X main.buildDate=$NOW \
     -X main.buildHost=$HOSTNAME \
     -X main.gitURL=$GIT_URL \
+    -X main.environment=$ENVIRONMENT \
     -X main.branch=$BRANCH_NAME \
     -X main.version=$SHORT_COMMIT" \
     -o main ./cmd/svr/main.go;

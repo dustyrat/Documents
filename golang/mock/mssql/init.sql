@@ -1,0 +1,4 @@
+DROP DATABASE Example;
+
+CREATE DATABASE Example;
+GO
