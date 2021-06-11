@@ -6,7 +6,7 @@ clean_up() {
 }
 
 echo "Starting mock database..."
-docker compose -f ./test/docker-compose.yaml up -d mongo
+docker compose -f ./docker-compose.yaml up -d mongo
 
 echo "Running unit tests"
 docker compose -f ./docker-compose.yaml up --build --abort-on-container-exit unit_tests
