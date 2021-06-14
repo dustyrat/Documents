@@ -2,14 +2,14 @@
 trap clean_up 0 1 2 3 9 15
 clean_up() {
   echo "Removing docker containers..."
-  docker compose -f ./docker-compose.yaml down -v --rmi all --remove-orphans
+  docker-compose -f ./docker-compose.yaml down -v --rmi all --remove-orphans
 }
 
 echo "Starting mock database..."
-docker compose -f ./docker-compose.yaml up -d mongo
+docker-compose -f ./docker-compose.yaml up -d mongo
 
 echo "Running unit tests"
-docker compose -f ./docker-compose.yaml up --build --abort-on-container-exit unit_tests
+docker-compose -f ./docker-compose.yaml up --build --abort-on-container-exit unit_tests
 status=$?
 
 if [ $status -eq 0 ]; then
