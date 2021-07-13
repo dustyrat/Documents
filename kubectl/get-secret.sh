@@ -4,8 +4,8 @@
 ## - kubectl: https://kubernetes.io/docs/tasks/tools/
 ## - yq: https://github.com/mikefarah/yq
 
-download-secret(){
-    echo "Downloading... $1 ($2)"
+get-secret(){
+    echo "Secret: $1 ($2)"
     mkdir -p $1;
     cd $1;
     kubectl get secret $1 -o yaml --context $2 > secret.yaml;
@@ -17,4 +17,4 @@ download-secret(){
     cd ../;
 }
 
-download-secret $1 $2
+get-secret $1 $2
