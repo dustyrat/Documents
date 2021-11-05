@@ -10,11 +10,15 @@ services:
       - "MONGO_URL=mongodb://mongo:27017"
       - "SQLSERVER_URL=sqlserver://sa:P%40ssW0rd%21@mssql:1433"
     volumes:
-      - ./:/coverage
-    working_dir:  "/root"
-    command: "go test ./... -coverprofile=/coverage/coverage.out"
+      - ../:/root/out
+    working_dir: "/root"
+    command: >
+      sh -c "
+        go test -v -tags musl -coverprofile=./out/coverage.out ./...
+      "
     depends_on:
       - mongo
+      - mssql
   mongo:
     container_name: mongo
     image: mongo:latest

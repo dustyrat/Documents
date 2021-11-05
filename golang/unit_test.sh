@@ -5,7 +5,7 @@ clean_up() {
   docker-compose -f ./docker-compose.yaml down -v --rmi all --remove-orphans
 }
 
-echo "Starting mock database..."
+echo "Starting mock services..."
 docker-compose -f ./docker-compose.yaml up -d mongo
 
 echo "Running unit tests"
