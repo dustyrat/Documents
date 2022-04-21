@@ -14,6 +14,7 @@ get-secret(){
     yq e -M ".data" secret.yaml | while read d; do
         eval $(echo $d | awk -F': ' '{ print "key="$1, "value="$2 }');
         echo $value | base64 -D > "data/$key";
+        dos2unix "data/$key";
     done;
     cd ../;
 }
