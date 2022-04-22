@@ -11,7 +11,6 @@ get-secrets(){
     kubectl get deploy $deployment --context $context -o jsonpath="\
 {range .spec.template.spec.containers[*]}{range .env[*]}{.valueFrom.secretKeyRef.name}{'\n'}{end}{end}\
 {range .spec.template.spec.containers[*]}{range .envFrom[*]}{.secretRef.name}{'\n'}{end}{end}\
-{range .spec.template.spec.imagePullSecrets[?(@.name!='regsecret')]}{.name}{'\n'}{end}\
 {range .spec.template.spec.volumes[*]}{.secret.secretName}{'\n'}{end}\
 {range .spec.tls[*]}{.secretName}{'\n'}{end}\
     " | sort | uniq | xargs -n1 | while read secret; do
