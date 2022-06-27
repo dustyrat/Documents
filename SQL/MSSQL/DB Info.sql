@@ -32,8 +32,8 @@ SELECT DISTINCT
     CASE
         WHEN FK_REF.TABLE_NAME IS NOT NULL
             THEN CONCAT(CASE COLUMNS.IS_NULLABLE
-                    WHEN 'Yes' THEN 'INNER JOIN '
-                    ELSE 'LEFT OUTER JOIN '
+                    WHEN 'Yes' THEN 'LEFT OUTER JOIN '
+                    ELSE 'INNER JOIN '
                 END, FK_REF.TABLE_CATALOG, '.', FK_REF.TABLE_SCHEMA, '.', FK_REF.TABLE_NAME, ' WITH(NOLOCK) ON ', FK_REF.TABLE_NAME, '.', FK_REF.COLUMN_NAME, ' = ', COLUMNS.TABLE_NAME, '.', COLUMNS.COLUMN_NAME)
             ELSE ''
     END AS [JOIN]
