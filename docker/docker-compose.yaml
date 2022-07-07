@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    ports:
+      - "27017-27019:27017-27019"
+    expose:
+      - "27017-27019"
+    environment:
+      - MONGO_INITDB_DATABASE=TEST
+    volumes:
+      - ./mongo:/docker-entrypoint-initdb.d
+    restart: on-failure
+  mssql:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    expose:
+      - "1433"
+    environment:
+      SA_PASSWORD: "P@ssW0rd!"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ./mssql:/usr/src/app
+    # bash will be executed from that path, our scripts folder
+    working_dir: /usr/src/app
+    # run the entrypoint.sh that will import the data AND sqlserver
+    command: sh -c ' chmod +x ./entrypoint.sh; ./entrypoint.sh & /opt/mssql/bin/sqlservr;'
+    restart: on-failure
+  # https://github.com/rmoff/kafka-listeners/blob/master/golang/docker-compose.yml
+  # https://github.com/confluentinc/cp-all-in-one/blob/6.2.0-post/cp-all-in-one/docker-compose.yml
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  broker:
+    image: confluentinc/cp-kafka:latest
+    container_name: broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
