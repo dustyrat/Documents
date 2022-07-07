@@ -3,32 +3,32 @@ package com.harrislogic.utilities;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-		
+
 public final class RandomUtls {
 	static double randomDouble(double min, double max){
 		if (max >= min){ return (Math.random() * (max - min + 1.0) + min); }
 		else { return (Math.random() * (min - max + 1.0) + max); }
 	}
-	
+
 	static double randomDouble(float min, float max){
 		if (max >= min){ return (Math.random() * (max - min + 1.0) + min); }
 		else { return (Math.random() * (min - max + 1.0) + max); }
 	}
-	
+
 	static double randomDouble(int min, int max){
 		if (max >= min){ return (Math.random() * (max - min + 1.0) + min); }
 		else { return (Math.random() * (min - max + 1.0) + max); }
 	}
-	
+
 	static double randomDouble(long min, long max){
 		if (max >= min){ return (Math.random() * (max - min + 1.0) + min); }
 		else { return (Math.random() * (min - max + 1.0) + max); }
 	}
-	
+
 	static float randomFloat(float min, float max){
 		return (float)(randomDouble(min, max));
 	}
-	
+
 	static int randomInt(int min, int max){
 		return (int)(randomDouble(min, max));
 	}
@@ -44,15 +44,15 @@ public final class RandomUtls {
 	static Object getRandom(Collection<Object> array){
 		return getRandom(array.toArray());
 	}
-	
+
 	static Object getRandom(Object[] array){
 		return array != null && array.length > 0 ? array[randomInt(0, array.length - 1)] : null;
 	}
-	
+
 	static Date getRandomDateBetween(Date start, Date end){
 		return getRandomDateBetween(start, end, false);
 	}
-	
+
 	static Date getRandomDateBetween(Date start, Date end, Boolean withTime){
 		long timeInMillis = randomLong(start.getTime(), end.getTime());
 		Calendar date = Calendar.getInstance();
@@ -65,13 +65,13 @@ public final class RandomUtls {
 		}
 		return date.getTime();
 	}
-	
+
 	static String randomAlphanumeric(String pattern){
 		String letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 		String consonants = "BCDFGHJKLMNPQRSTVWXYZ";
 		String vowels = "AEIOU";
 		String hex = "0123456789ABCDEF";
-		
+
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < pattern.length(); i++){
 			switch(pattern.charAt(i)){

@@ -27,13 +27,13 @@ COPY . .
 
 # Build the application
 RUN go build -ldflags "\
-    -X main.buildDate=$NOW \
-    -X main.buildHost=$HOSTNAME \
-    -X main.gitURL=$GIT_URL \
-    -X main.environment=$ENVIRONMENT \
-    -X main.branch=$BRANCH_NAME \
-    -X main.version=$SHORT_COMMIT" \
-    -o main ./cmd/svr/main.go;
+  -X main.buildDate=$NOW \
+  -X main.buildHost=$HOSTNAME \
+  -X main.gitURL=$GIT_URL \
+  -X main.environment=$ENVIRONMENT \
+  -X main.branch=$BRANCH_NAME \
+  -X main.version=$SHORT_COMMIT" \
+  -o main ./cmd/svr/main.go;
 
 # Move to / directory as the place for resulting binary folder
 WORKDIR /

@@ -9,21 +9,21 @@ var collection = db.getCollection("Document");
 */
 
 collection.insert({
-    "_id": ObjectId("000000000000000000000001"),
-    // TODO: Add fields
+  "_id": ObjectId("000000000000000000000001"),
+  // TODO: Add fields
 })
 
 collection.insert({
-    "_id": ObjectId("100000000000000000000001"),
-    // TODO: Add fields
+  "_id": ObjectId("100000000000000000000001"),
+  // TODO: Add fields
 })
 
 collection.insert({
-    "_id": ObjectId("200000000000000000000001"),
-    // TODO: Add fields
+  "_id": ObjectId("200000000000000000000001"),
+  // TODO: Add fields
 })
 
 collection.insert({
-    "_id": ObjectId("300000000000000000000001"),
-    // TODO: Add fields
+  "_id": ObjectId("300000000000000000000001"),
+  // TODO: Add fields
 })

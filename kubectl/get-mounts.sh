@@ -4,7 +4,7 @@
 ## - kubectl: https://kubernetes.io/docs/tasks/tools/
 ## - jq: https://stedolan.github.io/jq
 
-get-mounts(){
+get-mounts() {
     deployment=$1
     context=$2
 
@@ -15,19 +15,19 @@ get-mounts(){
 
             if $(echo $volume | jq '.secret != null'); then
                 name=$(echo $volume | jq -r .secret.secretName)
-                get-secret.sh $name $context;
+                get-secret.sh $name $context
                 echo "secret: ./$context/$name/data/$subPath -> $mountPath"
                 cp ./$context/secret/$name/data/$subPath ./$mountPath
             fi
 
             if $(echo $volume | jq '.configMap != null'); then
                 name=$(echo $volume | jq -r .configMap.name)
-                get-configmap.sh $name $context;
+                get-configmap.sh $name $context
                 echo "configmap: ./$context/$name/data/$subPath -> $mountPath"
                 cp ./$context/configmap/$name/data/$subPath ./$mountPath
             fi
-        done;
-    done;
+        done
+    done
 }
 
 get-mounts $1 $2

@@ -22,7 +22,7 @@ BEGIN
 	-- DECLARE @NameFormat VARCHAR(20)
 	-- SET @NameFormat = 'F M L S'
 	-- SET @NameString = 'Melvin Carter, Jr'
- 
+
 	DECLARE @Honorific VARCHAR(20)
 	DECLARE @FirstName VARCHAR(20)
 	DECLARE @MiddleName VARCHAR(30)
@@ -31,53 +31,54 @@ BEGIN
 	DECLARE @TempString VARCHAR(100)
 	DECLARE @TempString2 VARCHAR(100)
 	DECLARE @IgnorePeriod CHAR(1)
- 
+
 	--Prepare the string
- 
+
 	--Make sure each period IS followed by a space character.
 	SET @NameString = RTRIM(LTRIM(REPLACE(@NameString, '.', '. ')))
- 
+
 	--Remove disallowed characters
 	DECLARE @PatternString VARCHAR(50)
 	SET @PatternString = '%[^a-z ,-]%'
 	WHILE patindex(@PatternString, @NameString) > 0 SET @NameString = stuff(@NameString, patindex(@PatternString, @NameString), 1, ' ')
- 
+
 	--Remove telephone ext
 	SET @NameString = LTRIM(RTRIM(REPLACE(' ' + @NameString + ' ', ' EXT ', ' ')))
- 
+
 	--Eliminate double-spaces.
 	WHILE CHARINDEX('  ', @NameString) > 0 SET @NameString = REPLACE(@NameString, '  ', ' ')
- 
+
 	--Eliminate periods
 	WHILE CHARINDEX('.', @NameString) > 0 SET @NameString = REPLACE(@NameString, '.', '')
- 
+
 	--Remove spaces around hyphenated names
 	SET @NameString = REPLACE(REPLACE(@NameString, '- ', '-'), ' -', '-')
- 
+
 	--Remove commas before suffixes
 	SET @NameString = REPLACE(@NameString, ', Jr', ' Jr')
 	SET @NameString = REPLACE(@NameString, ', Sr', ' Sr')
 	SET @NameString = REPLACE(@NameString, ', II', ' II')
 	SET @NameString = REPLACE(@NameString, ', III', ' III')
- 
+
 	--Temporarily join multi-word surnames
 	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' Del ', ' Del~'))
 	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' Van ', ' Van~'))
 	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' Von ', ' Von~'))
 	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' Mc ', ' Mc~'))
 	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' Mac ', ' Mac~'))
-	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' La ', ' La~')) --Must be checked before "De", to handle "De La [Surname]"s.
+	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' La ', ' La~'))
+	--Must be checked before "De", to handle "De La [Surname]"s.
 	SET @NameString = LTRIM(REPLACE(' ' + @NameString, ' De ', ' De~'))
- 
+
 	--IF the lastname IS listed first, strip it off.
 	SET @TempString = RTRIM(LEFT(@NameString, CHARINDEX(' ', @NameString)))
 	--Below logic now handled by joining multi-word surnames above.
 	--IF @TempString IN ('VAN', 'VON', 'MC', 'Mac', 'DE') SET @TempString = RTRIM(LEFT(@NameString, CHARINDEX(' ', @NameString, LEN(@TempString)+2)))
- 
+
 	--Search for suffixes trailing the LastName
 	SET @TempString2 = LTRIM(RIGHT(@NameString, LEN(@NameString) - LEN(@TempString)))
 	SET @TempString2 = RTRIM(LEFT(@TempString2, CHARINDEX(' ', @TempString2)))
- 
+
 	IF RIGHT(@TempString2, 1) = ','
 	BEGIN
 		SET @Suffix = LEFT(@TempString2, LEN(@TempString2)-1)
@@ -86,7 +87,7 @@ BEGIN
 	IF RIGHT(@TempString, 1) = ',' SET @LastName = LEFT(@TempString, LEN(@TempString)-1)
 	IF LEN(@LastName) > 0 SET @NameString = LTRIM(RIGHT(@NameString, LEN(@NameString) - LEN(@TempString)))
 	IF LEN(@Suffix) > 0 SET @NameString = LTRIM(RIGHT(@NameString, LEN(@NameString) - LEN(@TempString2)))
- 
+
 	--Get rid of any remaining commas
 	WHILE CHARINDEX(',', @NameString) > 0 SET @NameString = REPLACE(@NameString, ',', '')
 	--Get Honorific and strip it out of the string
@@ -144,7 +145,7 @@ BEGIN
 			'Senior', 'Sr') SET @Suffix = @TempString
 		IF LEN(@Suffix) > 0 SET @NameString = RTRIM(LEFT(@NameString, LEN(@NameString) - LEN(@TempString)))
 	END
- 
+
 	IF @LastName IS NULL
 	BEGIN
 		--Get LastName and strip it out of the string
@@ -273,7 +274,7 @@ BEGIN
 				OR (ASCII(LEFT(@NameFormat, 1)) = 115 AND @Suffix IN ('BA', 'BS', 'DDS', 'DVM', 'II', 'III', 'IV', 'V', 'MBA', 'MD', 'PHD')))
 			SET @IgnorePeriod = 'T'
 		END
-			SET @NameFormat = RIGHT(@NameFormat, LEN(@NameFormat) - 1)
+		SET @NameFormat = RIGHT(@NameFormat, LEN(@NameFormat) - 1)
 	END
 	RETURN REPLACE(@TempString, '~', ' ')
 END

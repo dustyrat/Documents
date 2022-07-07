@@ -9,8 +9,8 @@ echo importing data...
 # run the init script to create the DB and the tables in /table
 # /opt/mssql-tools/bin/sqlcmd -S 0.0.0.0 -U sa -P $SA_PASSWORD -i ./init.sql
 
-for directory in ./database/* ; do
-  database=$(echo `basename "$directory"`);
+for directory in ./Databases/*; do
+  database=$(echo $(basename "$directory"))
   # Database
   for file in $directory/*.sql; do
     echo "executing $file"

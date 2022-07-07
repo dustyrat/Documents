@@ -1,5 +1,5 @@
 db = db.getSiblingDB('Example');
-db.createCollection("Example",{});
+db.createCollection("Example", {});
 collection = db.getCollection("Example");
 
 collection.createIndex({ "field1": 1 }, { "background": true, "sparse": true, "unique": true });

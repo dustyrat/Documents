@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-build-push(){
+build-push() {
     if [ -d .git ]; then
         DOCKERFILE=$1
         CONTAINER_NAME=$2
@@ -20,7 +20,7 @@ build-push(){
         else
             echo "Invalid environment '$ENVIRONMENT'"
             exit 1
-        fi;
+        fi
 
         NOW=$(date +'%Y-%m-%dT%H:%M:%S%z')
         HOSTNAME=$(hostname)
@@ -35,13 +35,13 @@ build-push(){
 
         echo Building... Container: ${CONTAINER_NAME}, Version ${SHORT_COMMIT}, Dockerfile: $DOCKERFILE
         docker build --no-cache -t "$TAG" \
-            --build-arg SHORT_COMMIT=$SHORT_COMMIT \
-            --build-arg NOW=$NOW \
-            --build-arg HOSTNAME=$HOSTNAME \
-            --build-arg GIT_URL=$GIT_URL \
-            --build-arg ENVIRONMENT=$ENVIRONMENT \
-            --build-arg BRANCH_NAME=$BRANCH_NAME \
-            -f $DOCKERFILE .
+        --build-arg SHORT_COMMIT=$SHORT_COMMIT \
+        --build-arg NOW=$NOW \
+        --build-arg HOSTNAME=$HOSTNAME \
+        --build-arg GIT_URL=$GIT_URL \
+        --build-arg ENVIRONMENT=$ENVIRONMENT \
+        --build-arg BRANCH_NAME=$BRANCH_NAME \
+        -f $DOCKERFILE .
 
         echo Pushing Image ${TAG}
         docker login $REGISTRY_URL
@@ -50,7 +50,7 @@ build-push(){
 
         # Cleaning up build process leftovers.
         docker rmi "$TAG"
-    fi;
+    fi
 }
 
 build-push $1 $2 $3

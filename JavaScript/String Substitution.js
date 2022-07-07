@@ -6,7 +6,7 @@
  * %f							Outputs a floating-point value. Formatting is supported, for example console.log("Foo %.2f", 1.1) will output the number to 2 decimal places: Foo 1.10
  * Note: Precision formatting doesn't work in Chrome
 **************************************************************************************/
-var obj = { integer: 1, string: 'String', floating: 3.14159265359};
+var obj = { integer: 1, string: 'String', floating: 3.14159265359 };
 console.log("Object: %o", obj);
 console.log("Integer: %i", obj.integer);
 console.log("String: %s", obj.string);

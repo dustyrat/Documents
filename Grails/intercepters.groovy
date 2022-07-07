@@ -10,7 +10,7 @@
 			log.debug info
 		}
 	}
-	
+
 	def beforeInsert(){
 		if (log.debugEnabled){
 			StringBuilder info = new StringBuilder().append("${this}\n")
@@ -23,7 +23,7 @@
 			log.debug info
 		}
 	}
-	
+
 	def afterInsert(){
 		if (log.debugEnabled){
 			StringBuilder info = new StringBuilder().append("${this}\n")
@@ -36,7 +36,7 @@
 			log.debug info
 		}
 	}
-	
+
 	def beforeUpdate(){
 		if (log.debugEnabled){
 			StringBuilder info = new StringBuilder().append("${this}\n")
@@ -52,7 +52,7 @@
 			log.debug info
 		}
 	}
-	
+
 	def afterUpdate(){
 		if (log.debugEnabled){
 			StringBuilder info = new StringBuilder().append("${this}\n")
@@ -65,7 +65,7 @@
 			log.debug info
 		}
 	}
-	
+
 	def beforeDelete(){
 		if (log.debugEnabled){
 			StringBuilder info = new StringBuilder().append("${this}\n")
@@ -78,7 +78,7 @@
 			log.debug info
 		}
 	}
-	
+
 	def afterDelete(){
 		if (log.debugEnabled){
 			StringBuilder info = new StringBuilder().append("${this}\n")

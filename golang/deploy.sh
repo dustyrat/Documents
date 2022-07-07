@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-deploy(){
+deploy() {
     if [ -d .git ]; then
         HELM_CHART=$1
         CONTAINER_NAME=$2
@@ -28,7 +28,7 @@ deploy(){
         else
             echo "Invalid context '$CONTEXT'"
             exit 1
-        fi;
+        fi
 
         BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
         SHORT_COMMIT=$(echo $BRANCH_NAME | cut -c1-2)-$(git rev-parse --short=8 HEAD)
@@ -41,12 +41,12 @@ deploy(){
         echo Namespace ${NAMESPACE}
         echo Environment ${ENVIRONMENT}
         helm2 upgrade $CONTAINER_NAME -i $HELM_CHART \
-            --set image.repository=$REPOSITORY \
-            --set image.tag=$SHORT_COMMIT \
-            # --set ingress.env=$ENVIRONMENT \
-            --namespace=$NAMESPACE \
-            --kube-context $CONTEXT
-    fi;
+        --set image.repository=$REPOSITORY \
+        --set image.tag=$SHORT_COMMIT \
+        # --set ingress.env=$ENVIRONMENT \
+        --namespace=$NAMESPACE \
+        --kube-context $CONTEXT
+    fi
 }
 
 deploy $1 $2 $3
