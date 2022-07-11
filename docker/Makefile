@@ -11,6 +11,9 @@ all: help
 kafka: ## Start a Kafka Broker
 	@docker compose -f ./docker-compose.yaml up -d zookeeper broker
 
+kafka-cluster: ## Start a 3 node Kafka Cluster
+	@docker compose -f ./docker-compose.yaml up -d zookeeper-1 zookeeper-2 zookeeper-3 broker-1 broker-2 broker-3
+
 mongo: ## Start a MongoDB server
 	@docker compose -f ./docker-compose.yaml up -d mongo
 
