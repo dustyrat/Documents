@@ -30,6 +30,21 @@ services:
     # run the entrypoint.sh that will import the data AND sqlserver
     command: sh -c ' chmod +x ./entrypoint.sh; ./entrypoint.sh & /opt/mssql/bin/sqlservr;'
     restart: on-failure
+  mysql:
+    container_name: mysql
+    image: mysql/mysql-server:latest
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "P@ssW0rd!"
+      MYSQL_USER: "sa"
+      MYSQL_PASSWORD: "P@ssW0rd!"
+      MYSQL_DATABASE: 'local'
+    command: --lower_case_table_names=1
+    restart: on-failure
+
   # https://github.com/rmoff/kafka-listeners/blob/master/golang/docker-compose.yml
   # https://github.com/confluentinc/cp-all-in-one/blob/6.2.0-post/cp-all-in-one/docker-compose.yml
   zookeeper:

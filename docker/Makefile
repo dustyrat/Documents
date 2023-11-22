@@ -20,6 +20,9 @@ mongo: ## Start a MongoDB server
 mssql: ## Start a MSSQL server
 	@docker compose -f ./docker-compose.yaml up -d mssql
 
+mysql: ## Start a MySQL server
+	@docker compose -f ./docker-compose.yaml up -d mysql
+
 stop: ## Stop services
 	@docker compose -f ./docker-compose.yaml stop
 
