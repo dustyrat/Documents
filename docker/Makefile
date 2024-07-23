@@ -4,18 +4,19 @@ WHITE  		:= $(shell tput -Txterm setaf 7)
 CYAN   		:= $(shell tput -Txterm setaf 6)
 RESET  		:= $(shell tput -Txterm sgr0)
 
+DOCKER_COMPOSE ?= ./docker-compose.yaml
 ENV_FILE ?= .env.local
 ACTION ?= stop
 ARGS ?= 
 CONTAINERS ?= 
 
-.PHONY: all mongo mssql
+.PHONY: all login mongo mssql stop down clean help
 
 all: help
 
 ## Docker:
 compose: ## Docker Compose (usage: make compose ENV_FILE=.env.local ACTION=up ARGS=-d CONTAINERS=postgres)
-	docker compose -f ./docker-compose.yaml --env-file $(ENV_FILE) $(ACTION) $(ARGS) $(CONTAINERS)
+	docker compose -f $(DOCKER_COMPOSE) --env-file $(ENV_FILE) $(ACTION) $(ARGS) $(CONTAINERS)
 
 clean: ## Clean up docker (Stop containers, prune network, containers and images, remove volumes)
 	@docker stop $(shell docker ps -a -q) || true;
@@ -24,22 +25,16 @@ clean: ## Clean up docker (Stop containers, prune network, containers and images
 	@docker image prune -af || true;
 	@docker volume rm $(shell docker volume ls -qf dangling=true) || true;
 
-down: ## Stop and remove containers, networks
+down: ## Stop and remove composed containers and networks
 	@${MAKE} compose ACTION=down ARGS="-v --remove-orphans"
 
-registry-destroy: ## Remove the container of the local docker registry
-	@docker container rm -v registry
-
-registry-start: ## Start a local docker registry for testing
-	@docker run -d -p 5000:5000 --restart=always --name registry registry:latest
-
-registry-stop: ## Stop the local docker registry
-	@docker container stop registry
-
-stop: ## Stop composed services
+stop: ## Stop services
 	@${MAKE} compose ACTION=stop
 
 ## Docker Containers:
+cassandra: ## Start a Cassandra Database
+	@${MAKE} compose ACTION=up CONTAINERS=cassandra
+
 kafka: ## Start a Kafka Broker
 	@${MAKE} compose ACTION=up CONTAINERS="zookeeper broker"
 
@@ -57,6 +52,10 @@ mysql: ## Start a MySQL Database
 
 postgres: ## Start a Postgres Database
 	@${MAKE} compose ACTION=up CONTAINERS=postgres
+
+## Misc:
+config: ## Get configuration from configserver (usage: make config APPLICATION=rome-catalog PROFILES=nonprod,dev,local,rome BRANCH=master)
+	@curl -X GET -H "X-Config-Token: $(CONFIG_TOKEN)" "$(CONFIG_URL)/$(APPLICATION)/$(PROFILES)/$(BRANCH)"
 
 ## Help:
 help: ## Show this help.
