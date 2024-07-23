@@ -53,10 +53,6 @@ mysql: ## Start a MySQL Database
 postgres: ## Start a Postgres Database
 	@${MAKE} compose ACTION=up CONTAINERS=postgres
 
-## Misc:
-config: ## Get configuration from configserver (usage: make config APPLICATION=rome-catalog PROFILES=nonprod,dev,local,rome BRANCH=master)
-	@curl -X GET -H "X-Config-Token: $(CONFIG_TOKEN)" "$(CONFIG_URL)/$(APPLICATION)/$(PROFILES)/$(BRANCH)"
-
 ## Help:
 help: ## Show this help.
 	@echo ''
