@@ -1,6 +1,16 @@
-version: "3.8"
-
 services:
+  cassandra:
+    container_name: cassandra
+    image: cassandra:latest
+    ports:
+      - "9042:9042"
+    expose:
+      - "9042"
+    environment:
+      CASSANDRA_USER: "${CASSANDRA_USER}"
+      CASSANDRA_PASSWORD: "${CASSANDRA_PASSWORD}"
+    volumes:
+      - db:/var/lib/cassandra:rw
   mongo:
     container_name: mongo
     image: mongo:latest
@@ -9,7 +19,7 @@ services:
     expose:
       - "27017-27019"
     environment:
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
     volumes:
       - ./mongo:/docker-entrypoint-initdb.d
     restart: on-failure
@@ -21,14 +31,14 @@ services:
     expose:
       - "1433"
     environment:
-      SA_PASSWORD: ${SA_PASSWORD}
+      SA_PASSWORD: "${SA_PASSWORD}"
       ACCEPT_EULA: "Y"
     volumes:
       - ./mssql:/usr/src/app
     # bash will be executed from that path, our scripts folder
     working_dir: /usr/src/app
     # run the entrypoint.sh that will import the data AND sqlserver
-    command: sh -c " chmod +x ./entrypoint.sh; ./entrypoint.sh & /opt/mssql/bin/sqlservr;"
+    command: sh -c ' chmod +x ./entrypoint.sh; ./entrypoint.sh & /opt/mssql/bin/sqlservr;'
     restart: on-failure
   mysql:
     container_name: mysql
@@ -38,10 +48,12 @@ services:
     expose:
       - "3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - db:/var/lib/mysql
     command: --lower_case_table_names=1
     restart: on-failure
   postgres:
@@ -50,13 +62,13 @@ services:
     ports:
       - "5432:5432"
     expose:
-      - 5432
+      - "5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       PGDATA: /data
-    volumes:
+    volumes: 
       - ./db:/var/lib/postgresql/data
       # - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
     restart: on-failure
@@ -172,3 +184,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+volumes:
+  db:
+    driver: local
