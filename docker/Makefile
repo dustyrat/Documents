@@ -5,17 +5,17 @@ CYAN   		:= $(shell tput -Txterm setaf 6)
 RESET  		:= $(shell tput -Txterm sgr0)
 
 DOCKER_COMPOSE ?= ./docker-compose.yaml
-ENV_FILE ?= .env.local
+ENV_FILE ?= .env
 ACTION ?= stop
-ARGS ?= 
-CONTAINERS ?= 
+ARGS ?=
+CONTAINERS ?=
 
 .PHONY: all login mongo mssql stop down clean help
 
 all: help
 
 ## Docker:
-compose: ## Docker Compose (usage: make compose ENV_FILE=.env.local ACTION=up ARGS=-d CONTAINERS=postgres)
+compose: ## Docker Compose (usage: make compose ENV_FILE=.env ACTION=up ARGS=-d CONTAINERS=postgres)
 	docker compose -f $(DOCKER_COMPOSE) --env-file $(ENV_FILE) $(ACTION) $(ARGS) $(CONTAINERS)
 
 clean: ## Clean up docker (Stop containers, prune network, containers and images, remove volumes)
@@ -52,6 +52,9 @@ mysql: ## Start a MySQL Database
 
 postgres: ## Start a Postgres Database
 	@${MAKE} compose ACTION=up CONTAINERS=postgres
+
+swagger-editor: ## Start swagger-editor
+	@${MAKE} compose ACTION=up CONTAINERS=swagger-editor ARGS=-d
 
 ## Help:
 help: ## Show this help.

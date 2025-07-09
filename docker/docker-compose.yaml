@@ -1,7 +1,7 @@
 services:
   cassandra:
     container_name: cassandra
-    image: cassandra:latest
+    image: cassandra:${CASSANDRA_VERSION}
     ports:
       - "9042:9042"
     expose:
@@ -13,7 +13,7 @@ services:
       - db:/var/lib/cassandra:rw
   mongo:
     container_name: mongo
-    image: mongo:latest
+    image: mongo:${MONGO_VERSION}
     ports:
       - "27017-27019:27017-27019"
     expose:
@@ -25,7 +25,7 @@ services:
     restart: on-failure
   mssql:
     container_name: mssql
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:${MSSSQL_VERSION}
     ports:
       - "1433:1433"
     expose:
@@ -42,7 +42,7 @@ services:
     restart: on-failure
   mysql:
     container_name: mysql
-    image: mysql/mysql-server:latest
+    image: mysql/mysql-server:${MYSQL_VERSION}
     ports:
       - "3306:3306"
     expose:
@@ -58,7 +58,7 @@ services:
     restart: on-failure
   postgres:
     container_name: postgres
-    image: postgres:alpine
+    image: postgres:${POSTGRES_VERSION}
     ports:
       - "5432:5432"
     expose:
@@ -68,22 +68,31 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       PGDATA: /data
-    volumes: 
+    volumes:
       - ./db:/var/lib/postgresql/data
       # - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    restart: on-failure
+
+  swagger-editor:
+    container_name: swagger-editor
+    image: swaggerapi/swagger-editor:${SWAGGER_VERSION}
+    ports:
+      - "80:8080"
+    expose:
+      - "80"
     restart: on-failure
 
   # https://github.com/rmoff/kafka-listeners/blob/master/golang/docker-compose.yml
   # https://github.com/confluentinc/cp-all-in-one/blob/6.2.0-post/cp-all-in-one/docker-compose.yml
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:${ZOOKEEPER_VERSION}
     container_name: zookeeper
     hostname: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
   broker:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:${BROKER_VERSION}
     container_name: broker
     hostname: broker
     ports:
@@ -101,7 +110,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
 
   zookeeper-1:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:${ZOOKEEPER_VERSION}
     container_name: zookeeper-1
     hostname: zookeeper-1
     ports:
@@ -111,7 +120,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
   zookeeper-2:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:${ZOOKEEPER_VERSION}
     container_name: zookeeper-2
     hostname: zookeeper-2
     ports:
@@ -121,7 +130,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2182
       ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
   zookeeper-3:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:${ZOOKEEPER_VERSION}
     container_name: zookeeper-3
     hostname: zookeeper-3
     ports:
@@ -131,7 +140,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2183
       ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
   broker-1:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:${BROKER_VERSION}
     container_name: broker-1
     hostname: broker-1
     ports:
@@ -149,7 +158,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
   broker-2:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:${BROKER_VERSION}
     container_name: broker-2
     hostname: broker-2
     ports:
@@ -167,7 +176,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
   broker-3:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:${BROKER_VERSION}
     container_name: broker-3
     hostname: broker-3
     ports:
