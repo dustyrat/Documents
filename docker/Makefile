@@ -39,7 +39,7 @@ kafka: ## Start a Kafka Broker
 	@${MAKE} compose ACTION=up CONTAINERS="zookeeper broker"
 
 kafka-cluster: ## Start a 3 node Kafka Cluster
-	@${MAKE} compose ACTION=up CONTAINERS="zookeeper-1 zookeeper-2 zookeeper-3 broker-1 broker-2 broker-3"
+	@${MAKE} compose ACTION=up CONTAINERS="zookeeper broker-1 broker-2 broker-3"
 
 mongo: ## Start a MongoDB Database
 	@${MAKE} compose ACTION=up CONTAINERS=mongo
