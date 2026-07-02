@@ -53,8 +53,14 @@ mysql: ## Start a MySQL Database
 postgres: ## Start a Postgres Database
 	@${MAKE} compose ACTION=up CONTAINERS=postgres
 
+redis:
+	@${MAKE} compose ACTION=up CONTAINERS=redis
+
 swagger-editor: ## Start swagger-editor
-	@${MAKE} compose ACTION=up CONTAINERS=swagger-editor ARGS=-d
+	@${MAKE} compose ACTION=up CONTAINERS=swagger-editor ARGS="-d"
+
+swagger-converter: ## Start swagger-converter
+	@${MAKE} compose ACTION=up CONTAINERS=swagger-converter ARGS="-d"
 
 ## Help:
 help: ## Show this help.
