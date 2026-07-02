@@ -31,6 +31,10 @@ indent_style = tab
 [*.bat]
 indent_style = tab
 
+# Bash files use tabs for indentation
+[*.sh]
+indent_style = tab
+
 [*.md]
 trim_trailing_whitespace = false
 
