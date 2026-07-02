@@ -7,8 +7,8 @@ services:
     expose:
       - "9042"
     environment:
-      CASSANDRA_USER: "${CASSANDRA_USER}"
-      CASSANDRA_PASSWORD: "${CASSANDRA_PASSWORD}"
+      - CASSANDRA_USER=${CASSANDRA_USER}
+      - CASSANDRA_PASSWORD=${CASSANDRA_PASSWORD}
     volumes:
       - db:/var/lib/cassandra:rw
   mongo:
@@ -20,19 +20,21 @@ services:
       - "27017-27019"
     environment:
       - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
-      - ./mongo:/docker-entrypoint-initdb.d
+      - ./mongo:/docker-entrypoint-initdb.d:z
     restart: on-failure
   mssql:
     container_name: mssql
-    image: mcr.microsoft.com/mssql/server:${MSSSQL_VERSION}
+    image: mssql/server:${MSSQL_VERSION}
     ports:
       - "1433:1433"
     expose:
       - "1433"
     environment:
-      SA_PASSWORD: "${SA_PASSWORD}"
-      ACCEPT_EULA: "Y"
+      - SA_PASSWORD=${SA_PASSWORD}
+      - ACCEPT_EULA=Y
     volumes:
       - ./mssql:/usr/src/app
     # bash will be executed from that path, our scripts folder
@@ -48,10 +50,10 @@ services:
     expose:
       - "3306"
     environment:
-      MYSQL_DATABASE: "${MYSQL_DATABASE}"
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_USER: "${MYSQL_USER}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - db:/var/lib/mysql
     command: --lower_case_table_names=1
@@ -64,22 +66,45 @@ services:
     expose:
       - "5432"
     environment:
-      POSTGRES_DB: "${POSTGRES_DB}"
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      PGDATA: /data
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/data
     volumes:
       - ./db:/var/lib/postgresql/data
       # - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
     restart: on-failure
 
+  redis:
+    container_name: redis
+    image: redis:${REDIS_VERSION}
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    volumes:
+      - ./mock:/data/conf
+
   swagger-editor:
     container_name: swagger-editor
     image: swaggerapi/swagger-editor:${SWAGGER_VERSION}
     ports:
-      - "80:8080"
+      - "8080:80"
     expose:
-      - "80"
+      - "8080"
+    # environment:
+    #   URL_SWAGGER2_CONVERTER: http://swagger-converter:8081
+    # depends_on:
+    #   - swagger-converter
+    restart: on-failure
+
+  swagger-converter:
+    container_name: swagger-converter
+    image: swaggerapi/swagger-converter:${SWAGGER_VERSION}
+    ports:
+      - "8081:8080"
+    expose:
+      - "8081"
     restart: on-failure
 
   # https://github.com/rmoff/kafka-listeners/blob/master/golang/docker-compose.yml
@@ -109,6 +134,39 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
 
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:${ZOOKEEPER_VERSION}
+    container_name: zookeeper-1
+    hostname: zookeeper-1
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+    restart: on-failure
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:${ZOOKEEPER_VERSION}
+    container_name: zookeeper-2
+    hostname: zookeeper-2
+    ports:
+      - "2182:2182"
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+    restart: on-failure
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:${ZOOKEEPER_VERSION}
+    container_name: zookeeper-3
+    hostname: zookeeper-3
+    ports:
+      - "2183:2183"
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2183
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+    restart: on-failure
   broker-1:
     image: confluentinc/cp-kafka:${BROKER_VERSION}
     container_name: broker-1
@@ -125,6 +183,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    restart: on-failure
   broker-2:
     image: confluentinc/cp-kafka:${BROKER_VERSION}
     container_name: broker-2
@@ -141,6 +200,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    restart: on-failure
   broker-3:
     image: confluentinc/cp-kafka:${BROKER_VERSION}
     container_name: broker-3
@@ -157,6 +217,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    restart: on-failure
 
 volumes:
   db:
